@@ -1,5 +1,5 @@
 # nginx-ecs-otel-webserver-module
-The full example repo show casing two different instrumentation collection metiods of otel-webserver-module on Nginx running in ECS
+The full example repo showcasing two different instrumentation collection methods of otel-webserver-module on Nginx running in ECS
 - New Relic OTLP
 - ADOT OTEL Collector as a Sidecar
 
@@ -25,7 +25,7 @@ ARG OPENTELEMETRY_CPP_VERSION=1.0.3
 # Define the search path for shared libraries used when compiling and running NGINX
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/opentelemetry-webserver-sdk/sdk_lib/lib
 
-# The latest OTel C++ web server module, otel-webserver-module supporting `NginxModuleOtelExporterOtlpHeaders` is only avaliable via GitHub Action Artifacts
+# The latest OTel C++ web server module, otel-webserver-module supporting `NginxModuleOtelExporterOtlpHeaders` is only available via GitHub Action Artifacts
 # Ref: https://github.com/open-telemetry/opentelemetry-cpp-contrib/tree/main/instrumentation/otel-webserver-module#download-the-artifact-1
 COPY opentelemetry-webserver-sdk-x64-linux.tgz 
 
@@ -53,7 +53,7 @@ What this `Dockerfile` does:
 - Tell NGINX to load the ngx_http_opentelemetry_module.so
 - Add the configuration of the modules to NGINX.
 
-Next, modify the `opentelemetry_module.conf` according to your use case by default the Dockerfile will build with configuration directives specific to the New Relic OLTP endpoint but you will need to be sure include your New Relic licnese key.
+Next, modify the `opentelemetry_module.conf` according to your use case by default the Dockerfile will build with configuration directives specific to the New Relic OLTP endpoint but you will need to be sure to include your New Relic license key.
 
 ```nginx
 NginxModuleEnabled ON;
@@ -70,11 +70,13 @@ NginxModuleTraceAsError ON;
 You have two choices for exporting data to New Relic via OTLP:
 
 * Directly from your app:
+
 ![Diagram showing a direct export to New Relic to your app.](readmeData/otlp.webp)
 
 The OTLP exporter in your app or service can export directly to the New Relic OTLP receiver.
 
 * Export from an OpenTelemetry Collector:
+
 ![Diagram showing the export to New Relic from a collector.](readmeData/collector.webp)
 
 This will enable the OpenTelemetry and apply the following configuration:
@@ -90,8 +92,8 @@ With the `Dockerfile` and NGINX config in place, build your docker image and run
 the container:
 
 ```console
-$ docker build -t nginx-otel --platform linux/amd64 .
-$ docker run --platform linux/amd64 --rm -p 80:80 nginx-otel
+$ docker build -t nginx-otelcpp:v1.0 --platform linux/amd64 .
+$ docker run --platform linux/amd64 --rm -p 80:80 nginx-otelcpp:v1.0
 ...
 
 Since the configuration above has `NginxModuleTraceAsError` set to `ON` and you
