@@ -1,0 +1,121 @@
+{
+    "family": "ecs-otel-fargate",
+    "taskRoleArn": "{{ecsTaskRoleArn}}",
+    "executionRoleArn": "{{ecsTaskExecutionRoleArn}}",
+    "requiresCompatibilities":
+    [
+        "FARGATE"
+    ],
+    "networkMode": "awsvpc",
+    "cpu": "1024",
+    "memory": "2048",
+    "containerDefinitions":
+    [
+        {
+            "name": "nginx-proxy",
+            "image": "<your-nginx-image>/nginx-otelcpp:v1.0",
+            "cpu": 256,
+            "memoryReservation": 256,
+            "essential": true,
+            "portMappings":
+            [
+                {
+                    "hostPort": "80",
+                    "containerPort": "80",
+                    "protocol": "tcp"
+                }
+            ],
+            "logConfiguration":
+            {
+                "logDriver": "awslogs",
+                "options":
+                {
+                    "awslogs-group": "/ecs/nginx-proxy",
+                    "awslogs-region": "{{region}}",
+                    "awslogs-stream-prefix": "ecs",
+                    "awslogs-create-group": "True"
+                }
+            }
+        },
+        {
+            "name": "aws-otel-collector",
+            "image": "amazon/aws-otel-collector",
+            "cpu": 256,
+            "memoryReservation": 128,
+            "essential": true,
+            "portMappings":
+            [
+                {
+                    "name": "aws-otel-collector-4317-tcp",
+                    "containerPort": 4317,
+                    "hostPort": 4317,
+                    "protocol": "tcp"
+                },
+                {
+                    "name": "aws-otel-collector-4318-tcp",
+                    "containerPort": 4318,
+                    "hostPort": 4318,
+                    "protocol": "tcp"
+                }
+            ],
+            "secrets":
+            [
+                {
+                    "valueFrom": "/newrelic-infra/ecs/license-key",
+                    "name": "NEW_RELIC_API_KEY"
+                },
+                {
+                    "name": "AOT_CONFIG_CONTENT",
+                    "valueFrom": "otel-collector-config"
+                }
+            ],
+            "logConfiguration":
+            {
+                "logDriver": "awslogs",
+                "options":
+                {
+                    "awslogs-group": "/ecs/ecs-aws-otel-sidecar-collector",
+                    "awslogs-region": "{{region}}",
+                    "awslogs-stream-prefix": "ecs",
+                    "awslogs-create-group": "True"
+                }
+            }
+        },
+        {
+            "name": "newrelic-infra",
+            "image": "newrelic/nri-ecs:1.10.3",
+            "cpu": 256,
+            "memoryReservation": 512,
+            "environment":
+            [
+                {
+                    "name": "NRIA_OVERRIDE_HOST_ROOT",
+                    "value": ""
+                },
+                {
+                    "name": "NRIA_IS_FORWARD_ONLY",
+                    "value": "true"
+                },
+                {
+                    "name": "FARGATE",
+                    "value": "true"
+                },
+                {
+                    "name": "NRIA_PASSTHROUGH_ENVIRONMENT",
+                    "value": "ECS_CONTAINER_METADATA_URI,ECS_CONTAINER_METADATA_URI_V4,FARGATE"
+                },
+                {
+                    "name": "NRIA_CUSTOM_ATTRIBUTES",
+                    "value": "{\"nrDeployMethod\":\"downloadPage\"}"
+                }
+            ],
+            "secrets":
+            [
+                {
+                    "valueFrom": "/newrelic-infra/ecs/license-key",
+                    "name": "NRIA_LICENSE_KEY"
+                }
+            ]
+        }
+    ]
+}
