@@ -92,8 +92,8 @@ With the `Dockerfile` and NGINX config in place, build your docker image and run
 the container:
 
 ```console
-$ docker build -t nginx-otel --platform linux/amd64 .
-$ docker run --platform linux/amd64 --rm -p 80:80 nginx-otel
+$ docker build -t nginx-otelcpp:v1.0 --platform linux/amd64 .
+$ docker run --platform linux/amd64 --rm -p 80:80 nginx-otelcpp:v1.0
 ...
 
 Since the configuration above has `NginxModuleTraceAsError` set to `ON` and you
