@@ -70,11 +70,13 @@ NginxModuleTraceAsError ON;
 You have two choices for exporting data to New Relic via OTLP:
 
 * Directly from your app:
+
 ![Diagram showing a direct export to New Relic to your app.](readmeData/otlp.webp)
 
 The OTLP exporter in your app or service can export directly to the New Relic OTLP receiver.
 
 * Export from an OpenTelemetry Collector:
+
 ![Diagram showing the export to New Relic from a collector.](readmeData/collector.webp)
 
 This will enable the OpenTelemetry and apply the following configuration:
