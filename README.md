@@ -1,6 +1,5 @@
 # nginx-ecs-otel-webserver-module
-The full example repo showcasing instrumentation collection method of otel-webserver-module on Nginx running in ECS
-- ADOT OTEL Collector as a Sidecar
+The example repo showcases the instrumentation collection method of `otel-webserver-module` on Nginx running in ECS using ADOT OTEL Collector as a Sidecar.
 
 ## Install the module for NGINX
 
@@ -83,10 +82,9 @@ the container:
 ```console
 $ docker build -t nginx-otelcpp:v1.0 --platform linux/amd64 .
 $ docker run --platform linux/amd64 --rm -p 80:80 nginx-otelcpp:v1.0
-...
+```
 
-Since the configuration above has `NginxModuleTraceAsError` set to `ON` and you
-will see your traces dump to the error log of NGINX:
+> Since the configuration above has `NginxModuleTraceAsError` set to `ON` and you will see your traces dump to the error log of NGINX:
 
 ```log
 2022/08/12 09:31:12 [error] 70#70: *3 mod_opentelemetry: startMonitoringRequest: Starting Request Monitoring for: / HTTP/1.1
@@ -104,9 +102,9 @@ Host, client: 172.17.0.1, server: localhost, request: "GET / HTTP/1.1", host: "l
 2022/08/12 09:31:12 [error] 70#70: *3 mod_opentelemetry: otel_stopInteraction: Stopping the Interaction for: ngx_http_realip_module, client: 172.17.0.1, server: localhost, request: "GET / HTTP/1.1", host: "localhost:8080"
 ```
 
-Finally, ensure that youdeploy an instance of the AWS Distro for OpenTelemetry Collector, which is conveniently stored in the Elastic Container Registry (ECR) within the AWS network. This reduces network latency and speeds up container image pulls, resulting in faster deployment times.
+Next, ensure that you deploy an instance of the AWS Distro for OpenTelemetry Collector, which is conveniently stored in the Elastic Container Registry (ECR) within the AWS network. This reduces network latency and speeds up subsequent container image pulls, resulting in faster deployment times. See the full [task definition example](https://github.com/andrew-lozoya/nginx-ecs-otel-webserver-module/blob/main/task-definition/ecs-fargate-ADOTcollector-Sidecar.json).
 
-Subsequently, it is essential to tailor the Collector's configuration to incorporate a New Relic License Key. This customization can be achieved through the environment variable AOT_CONFIG_CONTENT, which should carry the entire Otel-Collector configuration file. In an ECS environment, you can easily set environment variable values using AWS Systems Manager Parameters, providing the flexibility to manage configurations efficiently:
+Finally, it is essential to tailor the Collector's configuration to incorporate a New Relic License Key. This customization can be achieved through the environment variable `AOT_CONFIG_CONTENT`, which should carry the entire [Otel-Collector configuration file](https://github.com/andrew-lozoya/nginx-ecs-otel-webserver-module/blob/main/otel-collector/otel-collector-config.yaml#L86). In an ECS environment, you can easily set environment variable values using AWS Systems Manager Parameters, providing the flexibility to manage configurations efficiently:
 
 See more ref: [https://aws-otel.github.io/docs/setup/ecs/config-through-ssm](https://aws-otel.github.io/docs/setup/ecs/config-through-ssm)
 
