@@ -28,3 +28,5 @@ RUN apt-get update \
 
 # 4. Copy in the configuration file for the NGINX OTel module
 COPY opentelemetry_module-NROTLP.conf /opt/opentelemetry_module.conf
+# OR use for use with the ADOT Collector running as a Sidecar 
+# COPY opentelemetry_module-ADOTcollector.conf /opt/opentelemetry_module.conf
