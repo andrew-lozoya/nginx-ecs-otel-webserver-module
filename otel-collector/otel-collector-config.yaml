@@ -84,21 +84,16 @@ exporters:
     endpoint: https://otlp.nr-data.net:4317
     headers:
       "api-key": <NEW_RELIC_LICENSE_KEY>
-  logging:
-    verbosity: detailed
 
 service:
-  telemetry:
-    logs:
-      level: "debug"
   pipelines:
     traces:
       receivers: [otlp]
       processors: [batch/traces]
-      exporters: [otlp, logging]
+      exporters: [otlp]
     metrics:
       receivers: [otlp]
       processors: [resourcedetection, cumulativetodelta, batch/metrics]
-      exporters: [otlp, logging]
+      exporters: [otlp]
 
   extensions: [health_check]
