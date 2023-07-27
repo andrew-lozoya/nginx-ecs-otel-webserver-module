@@ -8,13 +8,13 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY default.conf /etc/nginx/conf.d/default.conf
 
 # Define the version of the NGINX OTel module
-ARG OPENTELEMETRY_CPP_VERSION=1.0.3
+# ARG OPENTELEMETRY_CPP_VERSION=1.0.3 
 
 # Define the search path for shared libraries used when compiling and running NGINX
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/opentelemetry-webserver-sdk/sdk_lib/lib
 
-#The latest OTel C++ web server module, otel-webserver-module supporting `NginxModuleOtelExporterOtlpHeaders` is only avaliable via GitHub Action Artifacts
-#Ref: https://github.com/open-telemetry/opentelemetry-cpp-contrib/tree/main/instrumentation/otel-webserver-module#download-the-artifact-1
+# The latest OTel C++ web server module, otel-webserver-module supporting `NginxModuleOtelExporterOtlpHeaders` is only available via GitHub Action Artifacts
+# Ref: https://github.com/open-telemetry/opentelemetry-cpp-contrib/tree/main/instrumentation/otel-webserver-module#download-the-artifact-1
 COPY opentelemetry-webserver-sdk-x64-linux.tgz /tmp/opentelemetry-webserver-sdk-x64-linux.tgz
 
 RUN apt-get update \
