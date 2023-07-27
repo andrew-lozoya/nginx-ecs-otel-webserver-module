@@ -37,16 +37,16 @@ RUN apt-get update \
   && echo "load_module /opt/opentelemetry-webserver-sdk/WebServerModule/Nginx/1.23.1/ngx_http_opentelemetry_module.so;\n$(cat /etc/nginx/nginx.conf)" > /etc/nginx/nginx.conf
 
 # 4. Copy in the configuration file for the NGINX OTel module
-# COPY opentelemetry_module-ADOTcollector.conf /opt/opentelemetry_module.conf
+COPY opentelemetry_module-ADOTcollector.conf /opt/opentelemetry_module.conf
 ```
 
 What this `Dockerfile` does:
 
 - Pull a base image with NGINX 1.23.1 pre-installed
-- Copies a recent build artifact of opentelemetry-webserver-sdk-x64-linux.tgz package supporting `NginxModuleOtelExporterOtlpHeaders`
+- Copies a recent build artifact of `opentelemetry-webserver-sdk-x64-linux.tgz` package supporting `NginxModuleOtelExporterOtlpHeaders`
 - Unpack the package, put it into /opt & run ./install.sh
-- Add the dependencies at /opt/opentelemetry-webserver-sdk/sdk_lib/lib to the library path (LD_LIBRARY_PATH)
-- Tell NGINX to load the ngx_http_opentelemetry_module.so
+- Add the dependencies at `/opt/opentelemetry-webserver-sdk/sdk_lib/lib` to the library path (LD_LIBRARY_PATH)
+- Tell NGINX to load the `ngx_http_opentelemetry_module.so`
 - Add the configuration of the modules to NGINX.
 
 Next, modify the `opentelemetry_module.conf` according to your use case by default the Dockerfile will build with configuration directives specific to the New Relic OLTP endpoint but you will need to be sure to include your New Relic license key.
@@ -70,10 +70,10 @@ You have one choice for exporting data to New Relic via OTLP:
 
 This will enable the OpenTelemetry and apply the following configuration:
 
-- Send spans via OTLP to `localhost:4317`
+- Send spans/metrics via OTLP the `awsvpc` network on `localhost:4317`
 - Set the attributes `service.name` to `nginx-proxy`, `service.namespace` to
   `nginx` and the `service.instance_id` to `DemoInstanceId`
-- Report traces as errors, so you will see them in the NGINX log
+- Report traces as errors, so you will see them in the NGINX log. DISABLE for production builds!
 
 To learn all the settings available, see the [full list of directives][].
 
@@ -103,3 +103,12 @@ Host, client: 172.17.0.1, server: localhost, request: "GET / HTTP/1.1", host: "l
 2022/08/12 09:31:12 [error] 70#70: *3 mod_opentelemetry: otel_startInteraction: Interaction begin successful, client: 172.17.0.1, server: localhost, request: "GET / HTTP/1.1", host: "localhost:8080"
 2022/08/12 09:31:12 [error] 70#70: *3 mod_opentelemetry: otel_stopInteraction: Stopping the Interaction for: ngx_http_realip_module, client: 172.17.0.1, server: localhost, request: "GET / HTTP/1.1", host: "localhost:8080"
 ```
+
+Finally, ensure that youdeploy an instance of the AWS Distro for OpenTelemetry Collector, which is conveniently stored in the Elastic Container Registry (ECR) within the AWS network. This reduces network latency and speeds up container image pulls, resulting in faster deployment times.
+
+Subsequently, it is essential to tailor the Collector's configuration to incorporate a New Relic License Key. This customization can be achieved through the environment variable AOT_CONFIG_CONTENT, which should carry the entire Otel-Collector configuration file. In an ECS environment, you can easily set environment variable values using AWS Systems Manager Parameters, providing the flexibility to manage configurations efficiently:
+
+See more ref: [https://aws-otel.github.io/docs/setup/ecs/config-through-ssm](https://aws-otel.github.io/docs/setup/ecs/config-through-ssm)
+
+
+

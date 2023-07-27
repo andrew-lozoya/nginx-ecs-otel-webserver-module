@@ -61,10 +61,6 @@
             "secrets":
             [
                 {
-                    "valueFrom": "/newrelic-infra/ecs/license-key",
-                    "name": "NEW_RELIC_API_KEY"
-                },
-                {
                     "name": "AOT_CONFIG_CONTENT",
                     "valueFrom": "otel-collector-config"
                 }
