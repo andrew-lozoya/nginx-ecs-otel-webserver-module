@@ -20,7 +20,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY default.conf /etc/nginx/conf.d/default.conf
 
 # Define the version of the NGINX OTel module
-ARG OPENTELEMETRY_CPP_VERSION=1.0.3
+# ARG OPENTELEMETRY_CPP_VERSION=1.0.3
 
 # Define the search path for shared libraries used when compiling and running NGINX
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/opentelemetry-webserver-sdk/sdk_lib/lib
