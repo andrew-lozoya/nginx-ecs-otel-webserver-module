@@ -1,6 +1,5 @@
 # nginx-ecs-otel-webserver-module
-The full example repo showcasing two different instrumentation collection methods of otel-webserver-module on Nginx running in ECS
-- New Relic OTLP
+The full example repo showcasing instrumentation collection method of otel-webserver-module on Nginx running in ECS
 - ADOT OTEL Collector as a Sidecar
 
 ## Install the module for NGINX
@@ -25,9 +24,8 @@ COPY default.conf /etc/nginx/conf.d/default.conf
 # Define the search path for shared libraries used when compiling and running NGINX
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/opentelemetry-webserver-sdk/sdk_lib/lib
 
-# The latest OTel C++ web server module, otel-webserver-module supporting `NginxModuleOtelExporterOtlpHeaders` is only available via GitHub Action Artifacts
-# Ref: https://github.com/open-telemetry/opentelemetry-cpp-contrib/tree/main/instrumentation/otel-webserver-module#download-the-artifact-1
-COPY opentelemetry-webserver-sdk-x64-linux.tgz /tmp/opentelemetry-webserver-sdk-x64-linux.tgz
+# 1. Download the latest version of Consul template and the OTel C++ web server module, otel-webserver-module
+ADD https://github.com/open-telemetry/opentelemetry-cpp-contrib/releases/download/webserver%2Fv${OPENTELEMETRY_CPP_VERSION}/opentelemetry-webserver-sdk-x64-linux.tgz /tmp
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends dumb-init unzip \
@@ -39,8 +37,6 @@ RUN apt-get update \
   && echo "load_module /opt/opentelemetry-webserver-sdk/WebServerModule/Nginx/1.23.1/ngx_http_opentelemetry_module.so;\n$(cat /etc/nginx/nginx.conf)" > /etc/nginx/nginx.conf
 
 # 4. Copy in the configuration file for the NGINX OTel module
-COPY opentelemetry_module-NROTLP.conf /opt/opentelemetry_module.conf
-# OR use for use with the ADOT Collector running as a Sidecar 
 # COPY opentelemetry_module-ADOTcollector.conf /opt/opentelemetry_module.conf
 ```
 
@@ -58,8 +54,7 @@ Next, modify the `opentelemetry_module.conf` according to your use case by defau
 ```nginx
 NginxModuleEnabled ON;
 NginxModuleOtelSpanExporter otlp;
-NginxModuleOtelExporterEndpoint otlp.nr-data.net:4317;
-NginxModuleOtelExporterOtlpHeaders api-key=<NEW_RELIC_LICENSE_KEY>;
+NginxModuleOtelExporterEndpoint localhost:4317;
 NginxModuleServiceName nginx-proxy;
 NginxModuleServiceNamespace nginx;
 NginxModuleServiceInstanceId DemoInstanceId;
@@ -67,13 +62,7 @@ NginxModuleResolveBackends ON;
 NginxModuleTraceAsError ON;
 ```
 
-You have two choices for exporting data to New Relic via OTLP:
-
-* Directly from your app:
-
-![Diagram showing a direct export to New Relic to your app.](readmeData/otlp.webp)
-
-The OTLP exporter in your app or service can export directly to the New Relic OTLP receiver.
+You have one choice for exporting data to New Relic via OTLP:
 
 * Export from an OpenTelemetry Collector:
 
@@ -81,7 +70,7 @@ The OTLP exporter in your app or service can export directly to the New Relic OT
 
 This will enable the OpenTelemetry and apply the following configuration:
 
-- Send spans via OTLP to `otlp.nr-data.net:4317` with the required new relic api-key header
+- Send spans via OTLP to `localhost:4317`
 - Set the attributes `service.name` to `nginx-proxy`, `service.namespace` to
   `nginx` and the `service.instance_id` to `DemoInstanceId`
 - Report traces as errors, so you will see them in the NGINX log

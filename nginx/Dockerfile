@@ -13,9 +13,8 @@ COPY default.conf /etc/nginx/conf.d/default.conf
 # Define the search path for shared libraries used when compiling and running NGINX
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/opentelemetry-webserver-sdk/sdk_lib/lib
 
-# The latest OTel C++ web server module, otel-webserver-module supporting `NginxModuleOtelExporterOtlpHeaders` is only available via GitHub Action Artifacts
-# Ref: https://github.com/open-telemetry/opentelemetry-cpp-contrib/tree/main/instrumentation/otel-webserver-module#download-the-artifact-1
-COPY opentelemetry-webserver-sdk-x64-linux.tgz /tmp/opentelemetry-webserver-sdk-x64-linux.tgz
+# 1. Download the latest version of Consul template and the OTel C++ web server module, otel-webserver-module
+ADD https://github.com/open-telemetry/opentelemetry-cpp-contrib/releases/download/webserver%2Fv${OPENTELEMETRY_CPP_VERSION}/opentelemetry-webserver-sdk-x64-linux.tgz /tmp
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends dumb-init unzip \
@@ -27,6 +26,4 @@ RUN apt-get update \
   && echo "load_module /opt/opentelemetry-webserver-sdk/WebServerModule/Nginx/1.23.1/ngx_http_opentelemetry_module.so;\n$(cat /etc/nginx/nginx.conf)" > /etc/nginx/nginx.conf
 
 # 4. Copy in the configuration file for the NGINX OTel module
-COPY opentelemetry_module-NROTLP.conf /opt/opentelemetry_module.conf
-# OR use for use with the ADOT Collector running as a Sidecar 
-# COPY opentelemetry_module-ADOTcollector.conf /opt/opentelemetry_module.conf
+COPY opentelemetry_module-ADOTcollector.conf /opt/opentelemetry_module.conf
