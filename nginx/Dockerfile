@@ -15,7 +15,7 @@ ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/opentelemetry-webserver-sdk/sdk_lib/li
 
 #The latest OTel C++ web server module, otel-webserver-module supporting `NginxModuleOtelExporterOtlpHeaders` is only avaliable via GitHub Action Artifacts
 #Ref: https://github.com/open-telemetry/opentelemetry-cpp-contrib/tree/main/instrumentation/otel-webserver-module#download-the-artifact-1
-COPY opentelemetry-webserver-sdk-x64-linux.tgz 
+COPY opentelemetry-webserver-sdk-x64-linux.tgz /tmp/opentelemetry-webserver-sdk-x64-linux.tgz
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends dumb-init unzip \
